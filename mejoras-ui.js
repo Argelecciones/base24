@@ -34,7 +34,7 @@
     #vMapa #panelSec{grid-area:detalle;margin-top:16px}
     #vMapa #panelSec .barra{max-width:560px}
     #vMapa #panelSec .bloque-lista{column-count:2;column-gap:28px}
-    #vMapa #panelSec .bloque-lista h3,#vMapa #panelSec .bloque-lista ul{break-inside:avoid}
+    #vMapa #panelSec .bloque-lista h3{break-inside:avoid;break-after:avoid;margin-top:0} #vMapa #panelSec .bloque-lista ul{break-inside:avoid;margin:0 0 14px}
   }
 
   /* ---- Celulares: todo en una columna, sin cortes laterales ---- */
