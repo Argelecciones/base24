@@ -49,7 +49,7 @@
   </ul>
 
   <h3>Atribuciones</h3>
-  <p>IGN y CONAE (límites de departamentos) · Gobierno de la Provincia de Buenos Aires, Datos Abiertos · Misionero~commonswiki, Wikimedia Commons (circuitos de Río Negro) · ArgentinaDatos · DataCP (CC BY 4.0) · Fundación Libertad · Ruido, Reverso, Chequeado y AFP · Legislaturas, ministerios y portales de transparencia de cada jurisdicción · Disposición de bancas basada en <a href="https://github.com/elexnuk/arches" target="_blank" rel="noopener">Arches</a> (David Richfield, Mathis Rade, Ranjith Siji y Ambady Anand S.).</p>
+  <p>IGN y CONAE (límites de departamentos) · Gobierno de la Provincia de Buenos Aires, Datos Abiertos · Misionero~commonswiki, Wikimedia Commons (circuitos de Río Negro) · ArgentinaDatos (<a href="https://argentinadatos.com" target="_blank" rel="noopener">argentinadatos.com</a>; datos de la HCDN y el Senado) · DataCP (CC BY 4.0) · Fundación Libertad · Ruido, Reverso, Chequeado y AFP · Legislaturas, ministerios y portales de transparencia de cada jurisdicción · Disposición de bancas basada en <a href="https://github.com/elexnuk/arches" target="_blank" rel="noopener">Arches</a> (David Richfield, Mathis Rade, Ranjith Siji y Ambady Anand S.).</p>
 
   <h3>Licencias</h3>
   <ul>
