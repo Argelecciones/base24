@@ -69,7 +69,7 @@ const DATOS_URLS={
     return c.tipo_camara==='Unicameral'?j:`${j} · ${c.tipo_camara}`;
   }
 
-  function serieHtml(g,D,opc){
+  function remGrupos(mias,D,usadas){const gr={};mias.forEach(r=>{const k=[r.periodo_referencia,r.tipo_monto,r.fuente_id,r.periodicidad].join('|');(gr[k]=gr[k]||[]).push(r)});const col=['#185FA5','#378ADD','#85B7EB','#B5D4F4','#9FE1CB'];let h='';Object.values(gr).forEach(g=>{const t=g.find(r=>/total/i.test(r.concepto||'')&&num(r.monto)!=null);if(!t)return;const comp=g.filter(r=>r!==t&&!/total/i.test(r.concepto||'')&&num(r.monto)!=null);if(!comp.length)return;const tm=num(t.monto),suma=comp.reduce((s,r)=>s+num(r.monto),0);usadas.add(t);comp.forEach(r=>usadas.add(r));const obs=[...new Set(g.map(r=>r.observaciones).filter(Boolean))];h+='<div class="dt-card"><div class="dt-label">'+esc(t.concepto)+' · '+esc(t.tipo_monto)+' · '+esc(t.periodicidad)+'</div><div class="dt-monto">'+$$(tm)+'</div>'+(suma>0&&suma<=tm*1.02?'<div class="dt-bar">'+comp.map((r,i)=>'<span style="width:'+(num(r.monto)/tm*100)+'%;background:'+col[i%col.length]+'"></span>').join('')+'</div>':'')+'<div style="display:grid;grid-template-columns:14px 1fr auto;gap:6px 10px;align-items:center;font-size:13px;margin:6px 0 10px">'+comp.map((r,i)=>'<span style="width:10px;height:10px;border-radius:2px;background:'+col[i%col.length]+'"></span><span>'+esc(r.concepto)+'</span><b>'+$$(num(r.monto))+'</b>').join('')+'</div><div class="dt-chips"><span class="dt-chip per">Período '+esc(t.periodo_referencia)+'</span>'+(t.fuente_id?'<span class="dt-chip">Fuente: '+fuenteHtml(D.F,t.fuente_id)+'</span>':'')+badge(t.estado_verificacion)+'</div>'+obs.map(o=>'<div class="dt-sub" style="margin-top:8px">'+esc(o)+'</div>').join('')+'</div>'});return h} function serieHtml(g,D,opc){
     const filas=g.map(r=>({p:String(r.periodo_referencia),v:num(r.valor),o:r.observaciones||''})).filter(x=>x.v!=null).sort((a,b)=>a.p.localeCompare(b.p));
     if(!filas.length)return '';
     const max=Math.max(...filas.map(x=>x.v)),r0=g[0],unidad=r0.unidad;
@@ -90,7 +90,7 @@ const DATOS_URLS={
     const mias=D.rem.filter(r=>r.camara_id===cid).sort((a,b)=>String(b.periodo_referencia).localeCompare(String(a.periodo_referencia)));
     h+='<div class="dt-sec"><h3><svg class="ic" viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>Remuneración mensual de un legislador</h3>';
     if(!mias.length)h+='<div class="dt-nota">Todavía no hay datos de remuneración cargados para esta cámara.</div>';
-    mias.forEach(r=>{
+    const enGrupo=new Set();h+=remGrupos(mias,D,enGrupo);mias.filter(r=>!enGrupo.has(r)).forEach(r=>{
       const m=num(r.monto);
       h+=`<div class="dt-card"><div class="dt-label">${esc(r.concepto)} · ${esc(r.tipo_monto)} · ${esc(r.periodicidad)}</div>
         <div class="dt-monto">${m==null?'No disponible':$$(m)}</div>
