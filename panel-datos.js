@@ -11,7 +11,7 @@ const DATOS_URLS={
   if(!DATOS_URLS.rem&&!DATOS_URLS.pre)return;
   const css=document.createElement('style');
   css.textContent=`
-  #vDatos .dt-sec{margin-bottom:22px}
+  #vDatos .dt-sec{margin-bottom:22px}   #vDatos .dt-sec:has(.dt-viajes){display:flex;flex-direction:column}   #vDatos .dt-viajes{order:2}   #vDatos .dt-plegado{margin-bottom:10px}   #vDatos .dt-plegado summary{cursor:pointer;font-size:12px;font-weight:800;color:var(--pba);margin:4px 0 10px}
   #vDatos h3{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 10px}
   #vDatos .dt-card{background:var(--subtle);border-radius:10px;padding:14px 16px;margin-bottom:10px;border-left:5px solid var(--pba)}
   #vDatos .dt-label{font-size:12px;font-weight:700;color:var(--muted)}
@@ -69,15 +69,15 @@ const DATOS_URLS={
     return c.tipo_camara==='Unicameral'?j:`${j} · ${c.tipo_camara}`;
   }
 
-  function serieHtml(g,D){
+  function serieHtml(g,D,opc){
     const filas=g.map(r=>({p:String(r.periodo_referencia),v:num(r.valor),o:r.observaciones||''})).filter(x=>x.v!=null).sort((a,b)=>a.p.localeCompare(b.p));
     if(!filas.length)return '';
     const max=Math.max(...filas.map(x=>x.v)),r0=g[0],unidad=r0.unidad;
     const fv=v=>unidad==='ARS'?$$(v):v.toLocaleString('es-AR')+(unidad?' '+esc(unidad):'');
-    const par=filas.find(x=>/parcial/i.test(x.o));
+    const par=filas.find(x=>/parcial/i.test(x.o));const verNota=par&&(!opc||opc.siempre||!opc.vistas||!opc.vistas.has(par.o));if(par&&opc&&opc.vistas)opc.vistas.add(par.o);
     let h=`<div class="dt-card"><div class="dt-label">${esc(r0.indicador)}${badge(r0.estado_verificacion)}</div>`;
     filas.forEach(x=>{const p=/parcial/i.test(x.o);h+=`<div class="dt-rank"><span class="nom" style="width:64px">${esc(x.p)}${p?' *':''}</span><div class="bg"><div class="fill" style="width:${x.v/max*100}%${p?';opacity:.55':''}"></div></div><span class="m" style="width:130px">${fv(x.v)}</span></div>`});
-    h+=`<div class="dt-sub" style="margin-top:6px">${r0.fuente_id?'Fuente: '+fuenteHtml(D.F,r0.fuente_id):''}${par?'<br>* '+esc(par.o):''}</div></div>`;
+    h+=`<div class="dt-sub" style="margin-top:6px">${r0.fuente_id?'Fuente: '+fuenteHtml(D.F,r0.fuente_id):''}${verNota?'<br>* '+esc(par.o):''}</div></div>`;
     return h;
   }
   async function render(){
@@ -127,7 +127,7 @@ const DATOS_URLS={
       const series=Object.values(grupos).filter(g=>new Set(g.map(r=>r.periodo_referencia)).size>=3);
       const nomSeries=new Set(series.map(g=>g[0].indicador));
       const tr=trAll.filter(r=>!nomSeries.has(r.indicador));
-      h+='<div class="dt-sec"><h3'+((!tr.length&&!series.length)?' style="display:inline;margin-right:8px"':'')+'><svg class="ic" viewBox="0 0 24 24"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>Transparencia</h3>';h+=series.map(g=>serieHtml(g,D)).join('');
+      h+='<div class="dt-sec"><h3'+((!tr.length&&!series.length)?' style="display:inline;margin-right:8px"':'')+'><svg class="ic" viewBox="0 0 24 24"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>Transparencia</h3>';const vistas=new Set(),esTr=g=>/tramo/i.test(g[0].unidad||''),sT=series.filter(esTr);if(series.length)h+='<div class="dt-viajes">'+series.filter(g=>!esTr(g)).map(g=>serieHtml(g,D,{vistas})).join('')+(sT.length?'<details class="dt-plegado"><summary>Ver tramos aéreos ('+sT.length+')</summary>'+sT.map(g=>serieHtml(g,D,{siempre:true})).join('')+'</details>':'')+'</div>';
       if(!tr.length&&!series.length)h+='<span class="dt-nota">Sin indicadores disponibles para esta cámara.</span>';
       tr.forEach(r=>{
         const v=num(r.valor);
