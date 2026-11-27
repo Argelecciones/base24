@@ -1,0 +1,32 @@
+name: Actualizar datos del Congreso
+on:
+  schedule:
+    - cron: '0 */3 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bajar y validar
+        run: |
+          mkdir -p data
+          curl -sf --retry 3 https://api.argentinadatos.com/v1/diputados/diputados -o data/diputados.tmp
+          curl -sf --retry 3 https://api.argentinadatos.com/v1/senado/senadores -o data/senadores.tmp
+          python3 - <<'PY'
+          import json, sys
+          for f, minimo in (('diputados', 200), ('senadores', 60)):
+              d = json.load(open(f'data/{f}.tmp'))
+              if not isinstance(d, list) or len(d) < minimo:
+                  sys.exit(f'{f}: datos inválidos')
+          PY
+          mv data/diputados.tmp data/diputados.json
+          mv data/senadores.tmp data/senadores.json
+      - name: Guardar si hubo cambios
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add data
+          git diff --cached --quiet || (git commit -m "Actualizar datos del Congreso" && git push)
